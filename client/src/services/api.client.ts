@@ -1,7 +1,11 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
 // API Configuration - Demo Version
-const API_BASE_URL = 'http://localhost:3001'; // Demo backend port
+// In production (Render), backend serves frontend from same domain
+// In development, backend runs on localhost:3001
+const API_BASE_URL = import.meta.env.PROD 
+  ? window.location.origin  // Production: same domain
+  : 'http://localhost:3001'; // Development: separate port
 const API_TIMEOUT = 30000; // 30 seconds
 const MAX_RETRIES = 2;
 const RETRY_DELAY = 1000; // 1 second
