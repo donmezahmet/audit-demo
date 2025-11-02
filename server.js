@@ -90,10 +90,10 @@ app.post('/api/auth/logout', (req, res) => {
 app.get('/api/auth/status', (req, res) => {
   if (req.session && req.session.user) {
     return res.json({
-      authenticated: true,
+          authenticated: true,
       user: req.session.user,
       role: req.session.user.role,
-      permissions: {
+          permissions: {
         charts: ['all'], // Admin has access to all charts
         pages: ['all'],
         components: ['all']
@@ -106,9 +106,9 @@ app.get('/api/auth/status', (req, res) => {
 
 // Get permissions
 app.get('/api/auth/permissions', isAuthenticated, (req, res) => {
-  res.json({
-    success: true,
-    data: {
+    res.json({
+      success: true,
+      data: {
       charts: ['all'],
       pages: ['all'],
       components: ['all']
@@ -203,7 +203,7 @@ app.get('/api/finding-actions-aging', isAuthenticated, (req, res) => {
 
 // Finding Action Age Summary
 app.get('/api/finding-action-age-summary', isAuthenticated, (req, res) => {
-  res.json({
+    res.json({
     totalActions: 203,
     overdueActions: 58,
     upcomingActions: 125,
@@ -252,7 +252,7 @@ app.get('/api/lp-impact-score-cards', isAuthenticated, (req, res) => {
 
 // Financial Impact Sum
 app.get('/api/financial-impact-sum', isAuthenticated, (req, res) => {
-  res.json({
+      res.json({
     totalFraudImpact: 66490000,
     totalLPImpact: 12590000,
     totalCombined: 79080000
@@ -271,14 +271,14 @@ app.get('/api/mat-scores', isAuthenticated, (req, res) => {
 // Radar Chart Data
 app.get('/api/radar-chart-data', isAuthenticated, (req, res) => {
   const dimensions = mockData.matScores.dimensions;
-  
-  res.json({
+    
+    res.json({
     labels: dimensions.map(d => d.dimension),
     labelsWithGroups: dimensions.map(d => ({
-      dimension: d.dimension,
-      group: d.group,
-      fullLabel: `${d.dimension} (${d.group})`
-    })),
+        dimension: d.dimension,
+        group: d.group,
+        fullLabel: `${d.dimension} (${d.group})`
+      })),
     data2024: dimensions.map(d => d.score2024),
     data2025: dimensions.map(d => d.score2025)
   });
@@ -323,7 +323,7 @@ app.get('/api/statistics-by-type-and-risk', isAuthenticated, (req, res) => {
 
 // Department Stats
 app.get('/api/department-stats', isAuthenticated, (req, res) => {
-  res.json({
+    res.json({
     totalActions: 145,
     openActions: 62,
     overdueActions: 18,
@@ -389,8 +389,8 @@ app.post('/api/tasks', isAuthenticated, (req, res) => {
   mockData.tasks.push(newTask);
   res.json({ success: true, data: newTask });
 });
-
-// Update task
+    
+    // Update task
 app.put('/api/tasks/:id', isAuthenticated, (req, res) => {
   const taskId = parseInt(req.params.id);
   const taskIndex = mockData.tasks.findIndex(t => t.id === taskId);
@@ -402,7 +402,7 @@ app.put('/api/tasks/:id', isAuthenticated, (req, res) => {
       updated_at: new Date().toISOString()
     };
     res.json({ success: true, data: mockData.tasks[taskIndex] });
-  } else {
+    } else {
     res.status(404).json({ success: false, error: 'Task not found' });
   }
 });
@@ -415,7 +415,7 @@ app.delete('/api/tasks/:id', isAuthenticated, (req, res) => {
   if (taskIndex !== -1) {
     mockData.tasks.splice(taskIndex, 1);
     res.json({ success: true });
-  } else {
+      } else {
     res.status(404).json({ success: false, error: 'Task not found' });
   }
 });
@@ -426,8 +426,8 @@ app.delete('/api/tasks/:id', isAuthenticated, (req, res) => {
 
 // Get Action Responsible List (Demo - Only 2 emails)
 app.get('/api/email/action-responsible-list', isAuthenticated, (req, res) => {
-  res.json({
-    success: true,
+    res.json({
+      success: true,
     data: [
       { email: 'mahmuturan44@gmail.com', name: 'Mahmut Uran', actionCount: 45 },
       { email: 'donmezahmet@yandex.com', name: 'Ahmet Dönmez', actionCount: 34 }
@@ -437,8 +437,8 @@ app.get('/api/email/action-responsible-list', isAuthenticated, (req, res) => {
 
 // Get All Action Responsible List (Demo - Same 2 emails)
 app.get('/api/email/all-action-responsible-list', isAuthenticated, (req, res) => {
-  res.json({
-    success: true,
+    res.json({ 
+      success: true, 
     data: [
       { email: 'mahmuturan44@gmail.com', name: 'Mahmut Uran', actionCount: 45 },
       { email: 'donmezahmet@yandex.com', name: 'Ahmet Dönmez', actionCount: 34 }
@@ -448,8 +448,8 @@ app.get('/api/email/all-action-responsible-list', isAuthenticated, (req, res) =>
 
 // Get C-Level List (Demo - Same 2 emails)
 app.get('/api/email/clevel-list', isAuthenticated, (req, res) => {
-  res.json({
-    success: true,
+    res.json({
+      success: true,
     data: [
       { email: 'mahmuturan44@gmail.com', name: 'Mahmut Uran', cLevel: 'CEO', actionCount: 45 },
       { email: 'donmezahmet@yandex.com', name: 'Ahmet Dönmez', cLevel: 'CFO', actionCount: 34 }
@@ -466,8 +466,8 @@ app.post('/api/send-email', isAuthenticated, (req, res) => {
   console.log('   Subject:', req.body.subject);
   console.log('   Report Type:', req.body.reportingTarget);
   console.log('   =====================================\n');
-  res.json({ 
-    success: true, 
+    res.json({
+      success: true,
     message: '✅ Email logged to console (Demo mode - SendGrid not configured)'
   });
 });
@@ -479,8 +479,8 @@ app.post('/api/send-action-responsible-email', isAuthenticated, (req, res) => {
   console.log('   Recipients:', req.body.recipients);
   console.log('   Bulk Send:', req.body.bulkEmail);
   console.log('   =====================================\n');
-  res.json({ 
-    success: true, 
+    res.json({
+      success: true,
     message: '✅ Email logged to console (Demo mode - SendGrid not configured)'
   });
 });
@@ -492,8 +492,8 @@ app.post('/api/send-clevel-email', isAuthenticated, (req, res) => {
   console.log('   Recipients:', req.body.recipients);
   console.log('   Bulk Send:', req.body.bulkEmail);
   console.log('   =====================================\n');
-  res.json({ 
-    success: true, 
+        res.json({ 
+          success: true,
     message: '✅ Email logged to console (Demo mode - SendGrid not configured)'
   });
 });
@@ -509,8 +509,8 @@ app.get('/api/users', isAuthenticated, (req, res) => {
 
 // Get user permissions
 app.get('/api/permissions/user/:email', isAuthenticated, (req, res) => {
-  res.json({
-    success: true,
+    res.json({
+      success: true,
     data: {
       charts: ['all'],
       pages: ['all'],
@@ -574,9 +574,9 @@ app.post('/api/access-management/view-as', isAuthenticated, (req, res) => {
     charts: [],
     pages: []
   };
-  
-  res.json({
-    success: true,
+    
+    res.json({
+      success: true,
     data: {
       user: targetUser,
       role: targetUser.role,
@@ -595,7 +595,7 @@ app.post('/api/access-management/stop-view-as', isAuthenticated, (req, res) => {
     delete req.session.isImpersonating;
     
     res.json({ success: true });
-  } else {
+      } else {
     res.status(400).json({ success: false, error: 'Not impersonating' });
   }
 });
@@ -633,7 +633,7 @@ if (fs.existsSync(distPath)) {
   app.get('*', (req, res) => {
     res.sendFile(indexPath);
   });
-} else {
+      } else {
   console.log('⚠️  No dist folder found - expecting Vite dev server on port 5174');
 }
 
@@ -658,7 +658,7 @@ app.listen(PORT, async () => {
 app.use((err, req, res, next) => {
   console.error('Server Error:', err);
   res.status(500).json({
-    success: false,
+      success: false,
     error: 'Internal server error'
   });
 });
