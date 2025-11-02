@@ -21,7 +21,8 @@ const LoginPage: React.FC = () => {
       const success = await login(email, password);
       if (success) {
         const currentRole = useAuthStore.getState().role;
-        navigate(currentRole === 'team' ? '/my-actions' : '/');
+        // Use window.location.href for better production compatibility
+        window.location.href = currentRole === 'team' ? '/my-actions' : '/';
       } else {
         setError('Invalid email or password');
       }

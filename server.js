@@ -5,12 +5,14 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const cookieSession = require('cookie-session');
 const config = require('./config');
 const mockData = require('./mockData');
 
 const app = express();
-const PORT = config.port;
+// Render uses PORT env variable, fallback to config
+const PORT = process.env.PORT || config.port;
 
 // In-memory session storage (for demo purposes)
 const sessions = {};
@@ -34,7 +36,8 @@ app.use(cookieSession({
   keys: [config.session.secret],
   maxAge: config.session.maxAge,
   httpOnly: true,
-  sameSite: 'lax',
+  secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+  sameSite: 'lax', // Same-origin deployment
 }));
 
 // Helper: Check if user is authenticated
@@ -615,13 +618,23 @@ app.get('/api/finding-actions-aging-export', isAuthenticated, (req, res) => {
 // STATIC FILES (Frontend)
 // ======================
 
-// Serve static files from client/dist in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, 'client', 'dist')));
+// Serve static files from client/dist
+// In production (Render), this serves the built React app
+// In development, Vite dev server handles frontend
+const distPath = path.join(__dirname, 'client', 'dist');
+const indexPath = path.join(__dirname, 'client', 'dist', 'index.html');
+
+// Check if dist folder exists (production build)
+if (fs.existsSync(distPath)) {
+  console.log('📦 Serving static files from client/dist');
+  app.use(express.static(distPath));
   
+  // SPA fallback - all non-API routes serve index.html
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+    res.sendFile(indexPath);
   });
+} else {
+  console.log('⚠️  No dist folder found - expecting Vite dev server on port 5174');
 }
 
 // ======================
