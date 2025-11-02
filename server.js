@@ -17,14 +17,23 @@ const PORT = process.env.PORT || config.port;
 // In-memory session storage (for demo purposes)
 const sessions = {};
 
-// CORS configuration for development
-app.use(cors({
-  origin: [config.frontendUrl, 'http://localhost:5174'],
+// CORS configuration
+const corsOptions = {
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   exposedHeaders: ['Content-Disposition', 'Content-Length', 'Content-Type']
-}));
+};
+
+// In production (Render), frontend and backend are served from same origin
+// In development, allow localhost
+if (process.env.NODE_ENV === 'production') {
+  corsOptions.origin = true; // Allow same-origin requests
+} else {
+  corsOptions.origin = ['http://localhost:5174', 'http://localhost:3001'];
+}
+
+app.use(cors(corsOptions));
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
@@ -37,7 +46,8 @@ app.use(cookieSession({
   maxAge: config.session.maxAge,
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production', // HTTPS only in production
-  sameSite: 'lax', // Same-origin deployment
+  sameSite: 'lax', // Lax for same-origin deployment (works with redirects)
+  path: '/', // Ensure cookie is available for all paths
 }));
 
 // Helper: Check if user is authenticated
@@ -56,6 +66,8 @@ function isAuthenticated(req, res, next) {
 app.post('/api/auth/login', (req, res) => {
   const { email, password } = req.body;
   
+  console.log('🔐 Login attempt:', email);
+  
   // Check credentials
   const adminUser = config.adminUser;
   
@@ -67,6 +79,8 @@ app.post('/api/auth/login', (req, res) => {
       name: adminUser.name,
       role: adminUser.role
     };
+    
+    console.log('✅ Login successful, session set:', req.session.user);
     
     return res.json({
       success: true,
@@ -83,6 +97,7 @@ app.post('/api/auth/login', (req, res) => {
     });
   }
   
+  console.log('❌ Login failed: Invalid credentials');
   return res.status(401).json({ success: false, error: 'Invalid credentials' });
 });
 
@@ -94,12 +109,14 @@ app.post('/api/auth/logout', (req, res) => {
 
 // Get auth status
 app.get('/api/auth/status', (req, res) => {
+  console.log('🔍 Auth status check - Session:', req.session?.user ? 'exists' : 'missing');
+  
   if (req.session && req.session.user) {
     return res.json({
-          authenticated: true,
+      authenticated: true,
       user: req.session.user,
       role: req.session.user.role,
-          permissions: {
+      permissions: {
         charts: ['all'], // Admin has access to all charts
         pages: ['all'],
         components: ['all']
@@ -107,6 +124,7 @@ app.get('/api/auth/status', (req, res) => {
     });
   }
   
+  console.log('⚠️  No session found');
   return res.json({ authenticated: false });
 });
 
