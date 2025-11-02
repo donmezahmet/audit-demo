@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>External Login - Audit Dashboard</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .login-container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 500px;
+      min-height: 600px;
+      overflow: visible;
+      animation: slideUp 0.5s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .login-header {
+      background: linear-gradient(135deg, #5D3EBC 0%, #6B46C1 100%);
+      padding: 40px 30px;
+      text-align: center;
+      color: white;
+    }
+
+    .login-header h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .login-header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .login-body {
+      padding: 30px 25px;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #5D3EBC;
+      box-shadow: 0 0 0 3px rgba(93, 62, 188, 0.1);
+    }
+
+    .password-container {
+      position: relative;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      color: #666;
+      padding: 5px;
+    }
+
+    .password-toggle:hover {
+      color: #5D3EBC;
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+      margin-top: 10px;
+    }
+
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(251, 191, 36, 0.4);
+    }
+
+    .btn-login:active {
+      transform: translateY(0);
+    }
+
+    .btn-login:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .alert {
+      padding: 14px 16px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .alert-error {
+      background-color: #fee;
+      color: #c33;
+      border: 1px solid #fcc;
+    }
+
+    .alert-success {
+      background-color: #efe;
+      color: #3c3;
+      border: 1px solid #cfc;
+    }
+
+    .alert-warning {
+      background-color: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffc107;
+    }
+
+    .divider {
+      text-align: center;
+      margin: 30px 0;
+      position: relative;
+    }
+
+    .divider::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      width: 100%;
+      height: 1px;
+      background: #e0e0e0;
+    }
+
+    .divider span {
+      background: white;
+      padding: 0 15px;
+      position: relative;
+      color: #999;
+      font-size: 13px;
+    }
+
+    .forgot-password {
+      text-align: center;
+      margin: 15px 0;
+    }
+    
+    .forgot-password a {
+      color: #5D3EBC;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+    
+    .forgot-password a:hover {
+      color: #4c1d95;
+      text-decoration: underline;
+    }
+
+    .btn-secondary {
+      background: #f8fafc;
+      color: #64748b;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-left: 10px;
+    }
+
+    .btn-secondary:hover {
+      background: #f1f5f9;
+      color: #475569;
+      border-color: #cbd5e1;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .back-link a {
+      color: #5D3EBC;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    /* Password Reset Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 20px;
+      padding: 30px 25px;
+      width: 90%;
+      max-width: 500px;
+      min-height: 400px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: modalSlideUp 0.3s ease-out;
+    }
+
+    @keyframes modalSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .modal-header {
+      margin-bottom: 25px;
+      text-align: center;
+    }
+
+    .modal-header h2 {
+      color: #333;
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .modal-header p {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-header">
+      <h1>🔐 External Login</h1>
+      <p>Access the Audit Dashboard</p>
+    </div>
+    
+    <div class="login-body">
+      <div id="alertContainer"></div>
+      
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" required autocomplete="email">
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="password-container">
+            <input type="password" id="password" name="password" required autocomplete="current-password">
+            <button type="button" class="password-toggle" onclick="togglePassword()">👁️</button>
+          </div>
+        </div>
+        
+        <button type="submit" class="btn-login" id="loginBtn">
+          Login
+        </button>
+      </form>
+      
+      <div class="forgot-password">
+        <a href="#" onclick="showForgotPasswordModal()">Forgot Password?</a>
+      </div>
+      
+      <div class="divider">
+        <span>OR</span>
+      </div>
+      
+      <div class="back-link">
+        <a href="/">← Back to Main Login</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Password Reset Modal -->
+  <div id="resetModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🔒 Change Your Password</h2>
+        <p>Please set a new password to continue</p>
+      </div>
+      
+      <div id="resetAlertContainer"></div>
+      
+      <form id="resetForm">
+        <div class="form-group">
+          <label for="tempPassword">Temporary Password</label>
+          <div class="password-container">
+            <input type="password" id="tempPassword" name="tempPassword" required placeholder="Enter the temporary password from email">
+            <button type="button" class="password-toggle" onclick="toggleTempPassword()">👁️</button>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="newPassword">New Password</label>
+          <div class="password-container">
+            <input type="password" id="newPassword" name="newPassword" required minlength="8">
+            <button type="button" class="password-toggle" onclick="toggleNewPassword()">👁️</button>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <div class="password-container">
+            <input type="password" id="confirmPassword" name="confirmPassword" required minlength="8">
+            <button type="button" class="password-toggle" onclick="toggleConfirmPassword()">👁️</button>
+          </div>
+        </div>
+        
+        <button type="submit" class="btn-login" id="resetBtn">
+          Change Password
+        </button>
+      </form>
+    </div>
+  </div>
+
+    <!-- Forgot Password Modal -->
+    <div id="forgotPasswordModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>🔑 Forgot Password</h2>
+          <p>Enter your email address to receive a password reset link</p>
+        </div>
+        
+        <form id="forgotPasswordForm">
+          <div id="forgotAlertContainer"></div>
+          
+          <div class="form-group">
+            <label for="forgotEmail">Email Address</label>
+            <input type="email" id="forgotEmail" name="email" required 
+                   placeholder="Enter your email address" autocomplete="email">
+          </div>
+          
+          <div class="modal-actions">
+            <button type="submit" class="btn-login" id="forgotBtn">
+              <span class="btn-text">Send Reset Link</span>
+              <div class="loading">
+                <div class="spinner"></div>
+                <span>Sending...</span>
+              </div>
+            </button>
+            <button type="button" onclick="closeForgotPasswordModal()" class="btn-secondary">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Temporary Password Expired Modal -->
+    <div id="tempPasswordExpiredModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>⏰ Temporary Password Expired</h2>
+          <p>Your temporary password has expired after 24 hours</p>
+        </div>
+        
+        <div style="text-align: center; padding: 20px;">
+          <div style="font-size: 48px; margin-bottom: 20px;">⏰</div>
+          <p style="font-size: 16px; color: #64748b; margin-bottom: 20px;">
+            For security reasons, you need to request a new temporary password.
+          </p>
+          <button onclick="requestNewTempPassword()" class="btn-login" style="margin-right: 10px;">
+            📧 Request New Password
+          </button>
+          <button onclick="closeTempPasswordExpiredModal()" class="btn-secondary">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
+  <script>
+    let tempUserId = null;
+
+    function showAlert(message, type = 'error', container = 'alertContainer') {
+      const alertDiv = document.createElement('div');
+      alertDiv.className = `alert alert-${type}`;
+      alertDiv.textContent = message;
+      
+      const alertContainer = document.getElementById(container);
+      alertContainer.innerHTML = '';
+      alertContainer.appendChild(alertDiv);
+      
+      setTimeout(() => {
+        alertDiv.remove();
+      }, 5000);
+    }
+
+    function togglePassword() {
+      const input = document.getElementById('password');
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    function toggleTempPassword() {
+      const input = document.getElementById('tempPassword');
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    function toggleNewPassword() {
+      const input = document.getElementById('newPassword');
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    function toggleConfirmPassword() {
+      const input = document.getElementById('confirmPassword');
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const loginBtn = document.getElementById('loginBtn');
+      loginBtn.disabled = true;
+      loginBtn.innerHTML = '<span class="loading"></span> Logging in...';
+      
+      try {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        
+        const response = await fetch('/api/auth/external-login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          if (data.mustResetPassword) {
+            // Show password reset modal
+            tempUserId = data.userId;
+            showAlert('Please change your password to continue', 'warning');
+            document.getElementById('resetModal').classList.add('active');
+            loginBtn.disabled = false;
+            loginBtn.innerHTML = 'Login';
+          } else {
+            // Set user role before redirect
+            window.userRole = data.user.role;
+            window.userEmail = data.user.email;
+            
+            // Redirect to dashboard
+            showAlert('Login successful! Redirecting...', 'success');
+            setTimeout(() => {
+              window.location.href = '/';
+            }, 1000);
+          }
+        } else {
+          if (data.tempPasswordExpired) {
+            showTempPasswordExpiredModal();
+          } else {
+            showAlert(data.error || 'Login failed', 'error');
+          }
+          loginBtn.disabled = false;
+          loginBtn.innerHTML = 'Login';
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        showAlert('An error occurred. Please try again.', 'error');
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = 'Login';
+      }
+    });
+
+    document.getElementById('resetForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const resetBtn = document.getElementById('resetBtn');
+      const tempPassword = document.getElementById('tempPassword').value;
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      
+      if (!tempPassword) {
+        showAlert('Please enter the temporary password', 'error', 'resetAlertContainer');
+        return;
+      }
+      
+      if (newPassword !== confirmPassword) {
+        showAlert('Passwords do not match', 'error', 'resetAlertContainer');
+        return;
+      }
+      
+      if (newPassword.length < 8) {
+        showAlert('Password must be at least 8 characters', 'error', 'resetAlertContainer');
+        return;
+      }
+      
+      resetBtn.disabled = true;
+      resetBtn.innerHTML = '<span class="loading"></span> Changing Password...';
+      
+      try {
+        const response = await fetch('/api/auth/external-change-password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            userId: tempUserId, 
+            tempPassword: tempPassword,
+            newPassword: newPassword 
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          // Set user role before redirect
+          window.userRole = 'external';
+          window.userEmail = data.user?.email || '';
+          
+          showAlert('Password changed successfully! Redirecting...', 'success', 'resetAlertContainer');
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 1500);
+        } else {
+          showAlert(data.error || 'Failed to change password', 'error', 'resetAlertContainer');
+          resetBtn.disabled = false;
+          resetBtn.innerHTML = 'Change Password';
+        }
+      } catch (error) {
+        console.error('Password reset error:', error);
+        showAlert('An error occurred. Please try again.', 'error', 'resetAlertContainer');
+        resetBtn.disabled = false;
+        resetBtn.innerHTML = 'Change Password';
+      }
+    });
+
+    function showTempPasswordExpiredModal() {
+      document.getElementById('tempPasswordExpiredModal').classList.add('active');
+    }
+
+    function closeTempPasswordExpiredModal() {
+      document.getElementById('tempPasswordExpiredModal').classList.remove('active');
+    }
+
+    // Forgot Password Modal Functions
+    function showForgotPasswordModal() {
+      document.getElementById('forgotPasswordModal').classList.add('active');
+    }
+
+    function closeForgotPasswordModal() {
+      document.getElementById('forgotPasswordModal').classList.remove('active');
+      document.getElementById('forgotPasswordForm').reset();
+      clearAlerts('forgotAlertContainer');
+    }
+
+    async function requestNewTempPassword() {
+      const email = document.getElementById('email').value;
+      if (!email) {
+        showAlert('Please enter your email address first', 'error');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/auth/request-new-temp-password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          closeTempPasswordExpiredModal();
+          showAlert('New temporary password has been sent to your email. Please check your inbox.', 'success');
+        } else {
+          showAlert(data.error || 'Failed to request new password', 'error');
+        }
+      } catch (error) {
+        console.error('Request new temp password error:', error);
+        showAlert('An error occurred. Please try again.', 'error');
+      }
+    }
+
+    // Forgot password form event listener
+    document.getElementById('forgotPasswordForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('forgotEmail').value;
+      const forgotBtn = document.getElementById('forgotBtn');
+      const btnText = forgotBtn.querySelector('.btn-text');
+      const loading = forgotBtn.querySelector('.loading');
+      
+      // Show loading state
+      forgotBtn.disabled = true;
+      btnText.style.display = 'none';
+      loading.style.display = 'flex';
+      
+      try {
+        const response = await fetch('/api/auth/forgot-password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          showAlert(data.message, 'success', 'forgotAlertContainer');
+          // Close modal after 3 seconds
+          setTimeout(() => {
+            closeForgotPasswordModal();
+          }, 3000);
+        } else {
+          showAlert(data.error || 'Failed to send reset link. Please try again.', 'error', 'forgotAlertContainer');
+        }
+        
+      } catch (error) {
+        console.error('Forgot password error:', error);
+        showAlert('An error occurred. Please try again.', 'error', 'forgotAlertContainer');
+      } finally {
+        // Reset button state
+        forgotBtn.disabled = false;
+        btnText.style.display = 'block';
+        loading.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
+

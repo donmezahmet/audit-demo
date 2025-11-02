@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Risk Management - Audit Department</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f5f7fa;
+      padding-top: 70px;
+      overflow-x: hidden;
+    }
+
+    header {
+      background: linear-gradient(135deg, #5D3EBC 0%, #6B46C1 100%);
+      color: #ffffff;
+      font-size: 20px;
+      font-weight: 600;
+      box-shadow: 
+        0 4px 20px rgba(93, 62, 188, 0.3),
+        0 2px 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: none;
+      letter-spacing: -0.01em;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      height: 60px;
+      line-height: 60px;
+      padding: 0 32px;
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 0 0 20px 20px;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .header-content img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .header-content span {
+      background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.9) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .logo {
+      height: 36px;
+      vertical-align: middle;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 14px;
+      color: #ffffff;
+      margin-left: auto;
+      margin-top: -10px;
+    }
+
+    .header-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .header-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .user-avatar {
+      position: relative;
+      cursor: pointer;
+    }
+
+    .user-avatar-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #FFD10D, #FFA500);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 14px;
+      color: #5D3EBC;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .user-avatar-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(255, 209, 13, 0.4);
+    }
+
+    .user-dropdown {
+      position: fixed;
+      top: 60px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      min-width: 200px;
+      z-index: 10000;
+      display: none;
+      overflow: hidden;
+    }
+
+    .user-dropdown.show {
+      display: block;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .user-dropdown-header {
+      padding: 16px 20px 12px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+    }
+
+    .user-dropdown-header .user-full-name {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .user-dropdown-header .user-email {
+      font-size: 12px;
+      opacity: 0.8;
+      margin: 4px 0 0 0;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .user-dropdown-content {
+      padding: 8px 0;
+    }
+
+    .user-dropdown-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 20px;
+      color: #333;
+      text-decoration: none;
+      transition: background 0.2s ease;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .user-dropdown-item:hover {
+      background: rgba(102, 126, 234, 0.1);
+    }
+
+    .user-dropdown-item .icon {
+      margin-right: 10px;
+      font-size: 16px;
+    }
+
+    .header-btn.stop-impersonation {
+      background: linear-gradient(135deg, #fdcb6e, #e17055);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      margin-left: 12px;
+    }
+
+    .header-btn.stop-impersonation:hover {
+      background: linear-gradient(135deg, #e17055, #d63031);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(225, 112, 85, 0.3);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .content {
+      padding: 40px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .page-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: #2d3436;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .page-title::before {
+      content: '⚠️';
+      font-size: 36px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="header-left">
+        <img src="logo.png" alt="Logo" class="logo">
+        <span>Risk Management</span>
+      </div>
+      <div class="header-right">
+        <a href="team.html" class="header-btn team" id="teamDashboardBtn" style="display: none;">
+          Team Dashboard
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="content">
+    <div class="page-title">Risk Management</div>
+    <!-- Content will be added here -->
+  </div>
+
+  <script>
+    // Backend URL configuration
+    const backendURL = 'https://audit.getir.com';
+    // const backendURL = 'http://localhost:3000';
+
+    // Helper function to get initials from email
+    function getInitialsFromEmail(email) {
+      if (!email) return '??';
+      const name = email.split('@')[0];
+      const parts = name.split('.');
+      if (parts.length >= 2) {
+        return (parts[0][0] + parts[1][0]).toUpperCase();
+      }
+      return name.substring(0, 2).toUpperCase();
+    }
+
+    // Helper function to get full name from email
+    function getFullNameFromEmail(email) {
+      if (!email) return 'Unknown User';
+      const name = email.split('@')[0];
+      const parts = name.split('.');
+      return parts.map(part => part.charAt(0).toUpperCase() + part.slice(1)).join(' ');
+    }
+
+    // Check session and create header
+    fetch(`${backendURL}/api/auth/status`, {
+      credentials: 'include'
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (!data.authenticated) {
+          sessionStorage.removeItem('isAuthenticated');
+          window.location.href = 'index.html';
+          return;
+        }
+
+        // Set sessionStorage flag to remember authenticated state
+        sessionStorage.setItem('isAuthenticated', 'true');
+        console.log('✅ Risk Management - authenticated, sessionStorage flag set');
+
+        const email = data.user.email;
+        const role = data.role || 'user';
+        const permissions = data.permissions || {};
+        
+        // Check if user has permission to access Risk Management page
+        const hasRiskManagementPermission = permissions.pages && 
+                                           permissions.pages['Risk Management'] && 
+                                           permissions.pages['Risk Management'].can_access;
+        
+        if (!hasRiskManagementPermission) {
+          console.log('❌ User does not have permission to access Risk Management page');
+          alert('You do not have permission to access this page.');
+          window.location.href = 'index.html';
+          return;
+        }
+        
+        console.log('✅ Risk Management page access granted');
+        
+        // Create user info
+        const header = document.querySelector('header .header-content');
+        const userInfo = document.createElement('div');
+        userInfo.className = 'user-info';
+
+        userInfo.innerHTML = `
+          <a href="index.html" class="header-btn" style="text-decoration: none;">
+            <span>🏠</span>
+            Ana Sayfa
+          </a>
+          <button class="header-btn stop-impersonation" onclick="stopImpersonation()" id="headerStopImpersonationBtn" style="display: none;">⏹️ Stop</button>
+          
+          <div class="user-avatar" id="userAvatar">
+            <div class="user-avatar-btn">
+              ${getInitialsFromEmail(email)}
+            </div>
+          </div>
+        `;
+
+        // Create user dropdown
+        const userDropdown = document.createElement('div');
+        userDropdown.className = 'user-dropdown';
+        userDropdown.id = 'userDropdown';
+        userDropdown.innerHTML = `
+          <div class="user-dropdown-header">
+            <div class="user-full-name">${getFullNameFromEmail(email)}</div>
+            <div class="user-email">${email}</div>
+          </div>
+          <div class="user-dropdown-content">
+            <button class="user-dropdown-item" id="viewAsBtn" onclick="toggleAdminDropdown()" style="display: none;">
+              <span class="icon">👁️</span>
+              View As User
+            </button>
+            <button class="user-dropdown-item" id="adminBtn" onclick="openAdminPanel()" style="display: none;">
+              <span class="icon">🔐</span>
+              Admin Panel
+            </button>
+            <button class="user-dropdown-item" id="taskManagerBtn" onclick="openTaskManager()" style="display: none;">
+              <span class="icon">📋</span>
+              Task Manager
+            </button>
+            <button class="user-dropdown-item" id="sendEmailBtn" onclick="openSendEmailModal()" style="display: none;">
+              <span class="icon">📧</span>
+              Send Email
+            </button>
+            <a href="risk-management.html" class="user-dropdown-item">
+              <span class="icon">⚠️</span>
+              Risk Management
+            </a>
+            <a href="/api/auth/logout" class="user-dropdown-item" onclick="sessionStorage.removeItem('isAuthenticated');">
+              <span class="icon">🚪</span>
+              Logout
+            </a>
+          </div>
+        `;
+        document.body.appendChild(userDropdown);
+
+        header.appendChild(userInfo);
+
+        // Add event listener to user avatar
+        const userAvatar = document.getElementById('userAvatar');
+        if (userAvatar) {
+          userAvatar.addEventListener('click', () => {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+          });
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+          const dropdown = document.getElementById('userDropdown');
+          const avatar = document.getElementById('userAvatar');
+          if (dropdown && avatar && !avatar.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.remove('show');
+          }
+        });
+
+        // Show/hide elements based on role
+        if (role === 'admin') {
+          const adminBtn = document.getElementById('adminBtn');
+          const taskManagerBtn = document.getElementById('taskManagerBtn');
+          const sendEmailBtn = document.getElementById('sendEmailBtn');
+          if (adminBtn) adminBtn.style.display = 'flex';
+          if (taskManagerBtn) taskManagerBtn.style.display = 'flex';
+          if (sendEmailBtn) sendEmailBtn.style.display = 'flex';
+        }
+
+        if (role === 'team') {
+          const viewAsBtn = document.getElementById('viewAsBtn');
+          const teamDashboardBtn = document.getElementById('teamDashboardBtn');
+          if (viewAsBtn) viewAsBtn.style.display = 'flex';
+          if (teamDashboardBtn) teamDashboardBtn.style.display = 'flex';
+        }
+      })
+      .catch(error => {
+        console.error('Error checking session:', error);
+        sessionStorage.removeItem('isAuthenticated');
+        window.location.href = 'index.html';
+      });
+
+    // Placeholder functions for dropdown actions
+    function toggleAdminDropdown() {
+      console.log('Toggle admin dropdown');
+    }
+
+    function openAdminPanel() {
+      window.location.href = 'access-management.html';
+    }
+
+    function openTaskManager() {
+      window.location.href = 'task-manager.html';
+    }
+
+    function openSendEmailModal() {
+      console.log('Open send email modal');
+    }
+
+    function stopImpersonation() {
+      fetch(`${backendURL}/api/admin/stop-impersonation`, { 
+        method: 'POST',
+        credentials: 'include'
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            window.location.reload();
+          }
+        })
+        .catch(error => console.error('Error stopping impersonation:', error));
+    }
+  </script>
+</body>
+</html>

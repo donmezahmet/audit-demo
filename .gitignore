@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+client/node_modules/
+
+# Build outputs (COMMENTED OUT - we'll commit dist for production)
+# client/dist/
+
+# Logs
+*.log
+server*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local development files
+cookies.txt
+local_cookies.txt
+node.tar.gz
+node-v20.11.0-darwin-x64/
+
+# Backup folder (old files)
+backup/
+
+# Documentation (development notes)
+COMPONENT_PERMISSIONS_IMPLEMENTATION.md
+IMPLEMENTATION_COMPLETE.md
+NEXT_STEPS.md
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.backup

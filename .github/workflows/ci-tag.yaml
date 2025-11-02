@@ -1,0 +1,41 @@
+name: CI (Prod)
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  REPOSITORY_NAME: ${{ github.event.repository.name }}
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v4
+
+      - name: Set Environment Variables
+        run: |
+          echo "TAG=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+
+      - name: Image Build and Push
+        uses: getir/reusable/.github/actions/image-build-push@v1
+        with:
+          image: ${{ env.REPOSITORY_NAME }}
+          tag: ${{ env.TAG }}
+
+      - name: Update Manifest
+        uses: getir/reusable/.github/actions/gitops-image-updater@v1
+        with:
+          repo: ${{ env.REPOSITORY_NAME }}-manifests
+          image: ${{ env.REPOSITORY_NAME }}
+          image-tag: ${{ env.TAG }}
+          github-token: ${{ secrets.GITOPS_SECRET }}
+          auto-merge: true
+          files: |
+            prod/patch-deployment.yaml
