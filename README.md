@@ -57,12 +57,6 @@ cd ..
 npm start
 ```
 
-Then open: **http://localhost:5174** (development) or **http://localhost:3001** (production)
-
-### Login Credentials
-
-- **Email:** `mahmut@demo.com`
-- **Password:** `mahmutturan12345`
 
 ## 📁 Project Structure
 
@@ -114,8 +108,7 @@ audit-project-demo/
 - ✅ **Console Logging** - Email details are logged to backend console
 - ❌ **No SendGrid** - No actual email delivery (no API key)
 - 📝 **Test Emails Available:**
-  - mahmuturan44@gmail.com (Mahmut Uran)
-  - donmezahmet@yandex.com (Ahmet Dönmez)
+
 
 When you click "Send Email", a **preview modal** will open showing exactly how the email would look. This provides a realistic demo experience without actually sending emails.
 
@@ -134,60 +127,7 @@ All settings are in `config.js`:
 - Session Secret: Pre-configured
 - No environment variables needed
 
-## 🚀 Deployment Options
 
-### Free Hosting Recommendations
-
-#### 1. Render.com (Recommended) ⭐
-- Deploy both frontend and backend together
-- Free tier: 750 hours/month
-- Auto-deploy from GitHub
-- [Visit Render.com](https://render.com)
-
-#### 2. Vercel (Frontend) + Render (Backend)
-- **Frontend**: Deploy to Vercel (unlimited free hosting)
-- **Backend**: Deploy to Render
-- Update `api.client.ts` with your backend URL
-
-#### 3. Railway.app
-- $5 free credit per month
-- Easy setup
-- GitHub integration
-
-### Deployment Steps (Render.com)
-
-1. Push code to GitHub repository
-2. Create new Web Service on Render
-3. Connect your GitHub repo
-4. Build command: `cd client && npm install && npm run build && cd .. && npm install`
-5. Start command: `node server.js`
-6. Add environment variable: `NODE_ENV=production`
-7. Deploy!
-
-## 📝 Development Notes
-
-### Adding New Mock Data
-
-Edit `mockData.js` to add/modify mock data:
-
-```javascript
-// Example: Add new finding action
-mockData.generateFindingActions({ 
-  status: 'Open', 
-  auditYear: '2025', 
-  limit: 10 
-});
-```
-
-### Adding New API Endpoints
-
-Edit `server.js`:
-
-```javascript
-app.get('/api/your-endpoint', isAuthenticated, (req, res) => {
-  res.json({ your: 'data' });
-});
-```
 
 ## 🔒 Security Notes
 
@@ -202,10 +142,10 @@ app.get('/api/your-endpoint', isAuthenticated, (req, res) => {
 | Feature | Original | Demo |
 |---------|----------|------|
 | Database | PostgreSQL | None (mock data) |
-| Authentication | Google OAuth | admin/admin |
+| Authentication | Google OAuth | **/** |
 | External APIs | Jira, Google Sheets | None (mock) |
 | Email | SendGrid | Console log only |
-| Ports | 3000/5173 | 3001/5174 |
+| Ports | **/** |
 | Data | Real from APIs | Realistic mock data |
 
 ## 📦 Dependencies
@@ -223,32 +163,3 @@ app.get('/api/your-endpoint', isAuthenticated, (req, res) => {
 - React Query - Data fetching
 - Zustand - State management
 - Tailwind CSS - Styling
-
-## 🤝 Contributing
-
-This is a demo project. Feel free to:
-- Add more mock data scenarios
-- Improve UI/UX
-- Add new features
-- Fix bugs
-
-## 📄 License
-
-MIT License - Free to use for any purpose
-
-## 🎓 Learning Resources
-
-This demo is perfect for:
-- Learning React + Express architecture
-- Understanding audit dashboard workflows
-- Testing UI components
-- Demo presentations
-- Portfolio projects
-
-## 📞 Support
-
-For questions or issues, please create an issue in the repository.
-
----
-
-**Made with ❤️ for demonstration and learning purposes**
