@@ -60,14 +60,9 @@ export const useAuthStore = create<AuthStore>()(
               user: response.data.user,
               role: response.data.role,
               isAuthenticated: true,
+              permissions: response.data.permissions, // Get permissions from login response
               isLoading: false,
             });
-            
-            // Fetch permissions
-            const permissionsResponse = await authService.getPermissions();
-            if (permissionsResponse.success && permissionsResponse.data) {
-              set({ permissions: permissionsResponse.data });
-            }
             
             return true;
           }

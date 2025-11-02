@@ -72,7 +72,13 @@ app.post('/api/auth/login', (req, res) => {
       success: true,
       data: {
         user: req.session.user,
-        role: adminUser.role
+        role: adminUser.role,
+        permissions: {
+          charts: ['all'],
+          pages: ['all'],
+          components: ['all'],
+          interactiveComponents: ['all']
+        }
       }
     });
   }
