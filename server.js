@@ -6,7 +6,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
-const cookieSession = require('cookie-session');
+const cookieParser = require('cookie-parser');
 const config = require('./config');
 const mockData = require('./mockData');
 
@@ -16,6 +16,11 @@ const PORT = process.env.PORT || config.port;
 
 // In-memory session storage (for demo purposes)
 const sessions = {};
+
+// Generate simple session ID
+function generateSessionId() {
+  return Math.random().toString(36).substring(2) + Date.now().toString(36);
+}
 
 // CORS configuration
 const corsOptions = {
@@ -39,20 +44,23 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Session middleware
-app.use(cookieSession({
-  name: 'demo-session',
-  keys: [config.session.secret],
-  maxAge: config.session.maxAge,
-  httpOnly: true,
-  secure: process.env.NODE_ENV === 'production', // HTTPS only in production
-  sameSite: 'lax', // Lax for same-origin deployment (works with redirects)
-  path: '/', // Ensure cookie is available for all paths
-}));
+// Cookie parsing middleware
+app.use(cookieParser());
+
+// Helper: Get session from cookie
+function getSession(req) {
+  const sessionId = req.cookies['demo-session'];
+  if (sessionId && sessions[sessionId]) {
+    return sessions[sessionId];
+  }
+  return null;
+}
 
 // Helper: Check if user is authenticated
 function isAuthenticated(req, res, next) {
-  if (req.session && req.session.user) {
+  const session = getSession(req);
+  if (session && session.user) {
+    req.user = session.user;
     return next();
   }
   return res.status(401).json({ success: false, error: 'Not authenticated' });
@@ -72,20 +80,37 @@ app.post('/api/auth/login', (req, res) => {
   const adminUser = config.adminUser;
   
   if ((email === adminUser.username || email === adminUser.email) && password === adminUser.password) {
-    // Set session
-    req.session.user = {
+    // Create session
+    const sessionId = generateSessionId();
+    const userData = {
       id: 1,
       email: adminUser.email,
       name: adminUser.name,
       role: adminUser.role
     };
     
-    console.log('✅ Login successful, session set:', req.session.user);
+    sessions[sessionId] = {
+      user: userData,
+      createdAt: Date.now()
+    };
+    
+    console.log('✅ Login successful, session created:', sessionId);
+    
+    // Set cookie
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: config.session.maxAge,
+      path: '/'
+    };
+    
+    res.cookie('demo-session', sessionId, cookieOptions);
     
     return res.json({
       success: true,
       data: {
-        user: req.session.user,
+        user: userData,
         role: adminUser.role,
         permissions: {
           charts: ['all'],
@@ -103,19 +128,25 @@ app.post('/api/auth/login', (req, res) => {
 
 // Logout endpoint
 app.post('/api/auth/logout', (req, res) => {
-  req.session = null;
+  const sessionId = req.cookies['demo-session'];
+  if (sessionId) {
+    delete sessions[sessionId];
+    res.clearCookie('demo-session');
+  }
   res.json({ success: true });
 });
 
 // Get auth status
 app.get('/api/auth/status', (req, res) => {
-  console.log('🔍 Auth status check - Session:', req.session?.user ? 'exists' : 'missing');
+  const session = getSession(req);
   
-  if (req.session && req.session.user) {
+  console.log('🔍 Auth status check - Session:', session ? 'exists' : 'missing');
+  
+  if (session && session.user) {
     return res.json({
       authenticated: true,
-      user: req.session.user,
-      role: req.session.user.role,
+      user: session.user,
+      role: session.user.role,
       permissions: {
         charts: ['all'], // Admin has access to all charts
         pages: ['all'],
@@ -407,7 +438,7 @@ app.post('/api/tasks', isAuthenticated, (req, res) => {
   const newTask = {
     id: mockData.tasks.length + 1,
     ...req.body,
-    created_by: req.session.user.email,
+    created_by: req.user.email,
     created_at: new Date().toISOString()
   };
   mockData.tasks.push(newTask);
@@ -583,14 +614,21 @@ app.post('/api/access-management/view-as', isAuthenticated, (req, res) => {
     return res.status(404).json({ success: false, error: 'User not found' });
   }
   
+  const sessionId = req.cookies['demo-session'];
+  const session = sessions[sessionId];
+  
+  if (!session) {
+    return res.status(401).json({ success: false, error: 'No session' });
+  }
+  
   // Store original user in session
-  if (!req.session.originalUser) {
-    req.session.originalUser = req.session.user;
+  if (!session.originalUser) {
+    session.originalUser = session.user;
   }
   
   // Set impersonated user
-  req.session.user = targetUser;
-  req.session.isImpersonating = true;
+  session.user = targetUser;
+  session.isImpersonating = true;
   
   const permissions = mockData.accessManagement.rolePermissions[targetUser.role] || {
     components: [],
@@ -598,28 +636,35 @@ app.post('/api/access-management/view-as', isAuthenticated, (req, res) => {
     charts: [],
     pages: []
   };
-    
-    res.json({
-      success: true,
+  
+  res.json({
+    success: true,
     data: {
       user: targetUser,
       role: targetUser.role,
       permissions,
       isImpersonating: true,
-      originalUser: req.session.originalUser
+      originalUser: session.originalUser
     }
   });
 });
 
 // Stop impersonation
 app.post('/api/access-management/stop-view-as', isAuthenticated, (req, res) => {
-  if (req.session.originalUser) {
-    req.session.user = req.session.originalUser;
-    delete req.session.originalUser;
-    delete req.session.isImpersonating;
+  const sessionId = req.cookies['demo-session'];
+  const session = sessions[sessionId];
+  
+  if (!session) {
+    return res.status(401).json({ success: false, error: 'No session' });
+  }
+  
+  if (session.originalUser) {
+    session.user = session.originalUser;
+    delete session.originalUser;
+    delete session.isImpersonating;
     
     res.json({ success: true });
-      } else {
+  } else {
     res.status(400).json({ success: false, error: 'Not impersonating' });
   }
 });
