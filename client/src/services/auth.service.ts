@@ -19,7 +19,11 @@ export const authService = {
   },
 
   // Login with email/password (for external users)
-  login: async (credentials: LoginCredentials): Promise<ApiResponse<{ user: ExternalUser; role: string }>> => {
+  login: async (credentials: LoginCredentials): Promise<ApiResponse<{ 
+    user: ExternalUser; 
+    role: string;
+    permissions?: AuthState['permissions'];
+  }>> => {
     return api.post('/api/auth/login', credentials);
   },
 
